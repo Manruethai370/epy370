@@ -1,18 +1,28 @@
 import { router } from '@inertiajs/react';
 import React, { useState } from 'react';
+import FlashMessage from '@/Components/FlashMessage';
+import { usePage } from '@inertiajs/react';
+
+
 
 const EmployeeList = ({ employees, query }) => {
+    const { flash } = usePage().props; // ดึง flash จาก props
+
+    console.log(flash); // Debug: ดูว่า flash มีค่าอะไร
+
     const [search, setSearch] = useState(query || '');
-    //ข้อมูลของพนักงานที่ดึงมาจาก backend,ข้อมูลของพนักงานที่ดึงมาจาก backend
 
     const handleSearch = (e) => {
         e.preventDefault();
-        router.get('/employees', { search });
+        router.get('/employee', { search });
     };
-    //กำหนด state ชื่อ search ใช้เก็บค่าค้นหาเริ่มต้นเป็น query (หากมีค่า) หรือเป็นสตริงว่าง
 
     return (
+
+
         <div className="min-h-screen bg-gray-50 py-10">
+
+            <FlashMessage flash={flash} />
             <h1 className="text-4xl font-extrabold text-center text-indigo-600 mb-8">
                 Employee List
             </h1>
@@ -56,6 +66,9 @@ const EmployeeList = ({ employees, query }) => {
                                 <th className="px-6 py-4 text-left text-sm font-semibold uppercase">
                                     Age
                                 </th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold uppercase">
+                                    Photo
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="text-gray-700">
@@ -72,6 +85,24 @@ const EmployeeList = ({ employees, query }) => {
                                     <td className="px-6 py-4">{employee.first_name}</td>
                                     <td className="px-6 py-4">{employee.last_name}</td>
                                     <td className="px-6 py-4">{employee.birth_date}</td>
+                                    <td style={{ padding: '10px', border: '1px solid #f0f0f0', textAlign: 'center' }}>
+                                {employee.profile_picture ? (
+                                    <img
+                                    src={`/storage/${employee.profile_picture}`} // เพิ่ม /storage/ นำหน้า
+                                        alt={`${employee.first_name} ${employee.last_name}`}
+                                        style={{
+                                            width: '50px',
+                                            height: '50px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            display: 'block', // ทำให้ img เป็น block เพื่อจัดกึ่งกลาง
+                                            margin: '0 auto', // จัดให้อยู่ตรงกลางแนวนอน
+                                        }}
+                                    />
+                                ) : (
+                                    <span style={{ color: '#888' }}>ไม่มีรูปค่าาาา</span>
+                                )}
+                            </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -79,7 +110,7 @@ const EmployeeList = ({ employees, query }) => {
                 )}
             </div>
 
-            {/* Paginationการแบ่งหน้า */}
+            {/* Pagination */}
             <div className="flex justify-center mt-8 space-x-2">
                 {employees.links &&
                     employees.links.map((link, index) => (
